@@ -1,49 +1,25 @@
-//takes in an arr of char and corresponding frequency, prints the code for each character
+//takes in an frequency map, returns code for each char
 
-#include "bits/stdc++.h"
-
-using namespace std;
-
-class MinHeapNode{
-public:
-	int freq;
-	char c;
-	MinHeapNode* left;
-	MinHeapNode* right;
-
-	MinHeapNode(int freq, char c){
-		this->freq = freq;
-		this->c = c;
-		left = right = NULL;
-	}
-};
-
-class compare{
-public:
-	bool operator()(MinHeapNode* left, MinHeapNode* right){
-		return left->freq > right->freq;
-	}
-};
-
-void printCodes(MinHeapNode* root, string st){
-	
+void getCodes(MinHeapNode* root, string st, map<char, string> &codes){
 	if(!root) return;
 
 	if(root->c!='\0'){
-		cout<<root->c<<": "<<st<<endl;
+		codes.insert(make_pair(root->c, st));
 		return;
 	}
 
-	printCodes(root->left, st+"0");
-	printCodes(root->right, st+"1");
+	getCodes(root->left, st+"0", codes);
+	getCodes(root->right, st+"1", codes);
 }
 
-void huffmanCode(char a[], int f[], int n){
+map<char, string> huffmanCode(map<char, int> const &frequency){
 
 	priority_queue<MinHeapNode*, vector<MinHeapNode*>, compare> minHeap;
 
-	for(int i=0;i<n;i++){
-		minHeap.push(new MinHeapNode(f[i], a[i]));
+	map<char, int>::const_iterator it;
+
+	for(it = frequency.begin();it != frequency.end();it++){
+		minHeap.push(new MinHeapNode(it->second, it->first));
 	}
 
 	while(minHeap.size()!=1){
@@ -59,21 +35,14 @@ void huffmanCode(char a[], int f[], int n){
 		
 	}
 
-	printCodes(minHeap.top(), "");
+	map<char, string> codes;
+
+	getCodes(minHeap.top(), "", codes);
+
+	return codes;
 
 }
 
-
-int main(){
-	char arr[] = {'a', 'b', 'c', 'd', 'e', 'f'};
-	int f[] = {5, 9, 12, 13, 16, 45};
-
-	int n = sizeof(arr)/sizeof(arr[0]);
-
-	huffmanCode(arr, f, n);
-
-	return 0;
-}
 
 
 
