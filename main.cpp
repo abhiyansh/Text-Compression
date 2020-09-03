@@ -9,6 +9,10 @@ using namespace std;
 #include "MinHeap.h"
 #include "HuffmanCode.cpp"
 #include "Encode.cpp"
+#include "HuffmanTree.h"
+#include "BuildTree.cpp"
+#include "Decode.cpp"
+#include "PrintHuffmanTree.cpp"
 
 int main(){
 
@@ -22,7 +26,12 @@ int main(){
 
 	string encoded_str = encode(data, codes);
 
-	cout<<encoded_str<<endl;
+	HuffmanNode *huffmanTree = buildTree(codes);
+	// printHuffmanTree(huffmanTree, "");
+
+	string decoded_str = decode(huffmanTree, encoded_str);
+
+	cout<<decoded_str<<endl;
 
 	return 0;
 }
