@@ -26,3 +26,36 @@ string readCompressedFile(string input_add){
 	
 	return data;
 }
+
+int str2int(string st){
+	int n = 0;
+	int temp;
+
+	for(int i=0;i<st.length();i++){
+		temp = (int)(st[i]-48);
+		n*=10;
+		n+=temp;
+	}
+
+	return n;
+}
+
+vector< pair<char, int> > readEncodingData(string address){
+	
+	vector< pair<char, int> > encodingData;
+	string line;
+
+	ifstream file(address);
+
+	if(file.is_open()){
+		while(getline(file, line, '|')){
+			if(line.length())
+				encodingData.push_back(make_pair(line[0], str2int(line.substr(1))));
+		}
+	}
+
+	return encodingData;
+}
+
+
+
