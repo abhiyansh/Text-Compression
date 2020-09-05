@@ -1,5 +1,5 @@
-//Read file return string, and frequency of each element
 
+//Read file return the file as string and the frequency of each element.
 tuple<map<char, int>, string> readData(string input_add){
 	
 	string data = "";
@@ -16,4 +16,13 @@ tuple<map<char, int>, string> readData(string input_add){
 	}
 
 	return make_tuple(frequency, data);
+}
+
+string readCompressedFile(string input_add){
+	string data = "";
+	fstream fin(input_add, fstream::in);
+	char ch;
+	while (fin >> noskipws >> ch) data+=ch;
+	
+	return data;
 }
