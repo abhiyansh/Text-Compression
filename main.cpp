@@ -1,7 +1,6 @@
 #include "bits/stdc++.h"
 #include<fstream>
 
-
 using namespace std;
 
 //local files
@@ -18,53 +17,75 @@ using namespace std;
 #include "CanonicalCode.cpp"
 // #include "PrintHuffmanTree.cpp"
 
-int main(){
+int main(int argc, char** argv){
+
+	//mode, read, write addresses
+	string mode = argv[1];
+	string input_address = argv[2];
+	string output_address = argv[3];
+
 
 	/*encoding*/
+	if(mode=="-c"){
 
-	string input_address = "input.txt";
-	string data;
-	map<char, int> frequency;
+		string data;
+		map<char, int> frequency;
 
-	tie(frequency, data) = readData(input_address);
+		//read input data and calculate frequency of each character
+		tie(frequency, data) = readData(input_address);
+		//generate huffman codes for each character
+		map<char, string> codes = huffmanCode(frequency);
 
-	map<char, string> codes = huffmanCode(frequency);
+		//encoding data stores the length of huffman code for each character
+		vector<pair<char, int> > encodingData;
+		//stores the canonical huffman codes of each char
+		map<char, string> canonicalCodes;
 
-	vector<pair<char, int> > encodingData;
-	map<char, string> canonicalCodes;
+		//converts the huffman codes to canonical 
+		tie(encodingData, canonicalCodes) = getCanonicalCodes(codes);
 
-	tie(encodingData, canonicalCodes) = getCanonicalCodes(codes);
+		//encodes the original data using the canonical codes
+		string encoded_str = encode(data, canonicalCodes);
 
-	string encoded_str = encode(data, canonicalCodes);
+		//converts the encoded data into bytes and stores them as a string
+		string compressed_str = compress(encoded_str);
 
-	string compressed_str = compress(encoded_str);
+		//writes the compressed string
+		writeData(compressed_str, output_address);
 
-	writeData(compressed_str, "compressed.txt");
+		//writes the encoding information
+		writeEncodingData(encodingData, "EncodingData.txt");
 
-	//function to save the codes
-	writeEncodingData(encodingData, "EncodingData.txt");
+	}
 
 	/*decoding*/
+	else if(mode=="-u"){
+		//reads the compressed file
+		string compressed_str = readCompressedFile(input_address);
 
-	compressed_str = readCompressedFile("compressed.txt");
+		//reads the encoding information
+		vector<pair<char, int> > encodingData = readEncodingData("EncodingData.txt");
 
-	//function to read codes
-	encodingData = readEncodingData("EncodingData.txt");
+		//generates the canonical codes using the encoding information
+		map<char, string> canonicalCodes = genCanonicalCodes(encodingData);
 
-	canonicalCodes = genCanonicalCodes(encodingData);
+		//generates string of binary encoded information from the compressed file
+		string binary_file = uncompress(compressed_str);
 
-	string binary_file = uncompress(compressed_str);
+		//builds the huffman tree from canonical codes to efficiently decode info
+		HuffmanNode *huffmanTree = buildTree(canonicalCodes);
+		// printHuffmanTree(huffmanTree, "");
 
-	HuffmanNode *huffmanTree = buildTree(canonicalCodes);
-	// printHuffmanTree(huffmanTree, "");
+		//decodes the string of binaries to obtain the original uncompressed data
+		string decoded_str = decode(huffmanTree, binary_file);
 
-	string decoded_str = decode(huffmanTree, binary_file);
+		//write uncompressed data
+		writeData(decoded_str, output_address);
+	}
 
-	//write uncompressed data
-	writeData(decoded_str, "output.txt");
+	else{
+		cout<<"invalid mode"<<endl;
+	}
 
 	return 0;
 }
-
-
-
